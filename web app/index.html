@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <title>Online Fake News Detection</title>
+  <style>
+  textarea {
+    resize: none;
+  }
+  .button-one {
+    padding:10px 40px;
+    outline: none;
+    background-color: #27ae60;
+    border: none;
+    border-radius:5px;
+    box-shadow: 0 9px #95a5a6;
+    text-align: center;
+    cursor: pointer;
+    font-size:24px;
+    color: #fff;
+  }
+
+  .button-one:hover{
+    background-color: #2ecc71;
+  }
+
+  .button-one:active {
+    background-color: #2ecc71;
+    box-shadow: 0 5px #95a5a6;
+    transform: translateY(4px);
+  }
+</style>
+</head>
+<body>
+  <div class="container-fluid bg-dark p-3">
+    <h1 class="text-center text-white">Online Fake News Detection</h1>
+  </div>
+  <br>
+  <div class="container-fluid">
+    <h4 class="text-center">
+      Check your facts before you slip on them.
+    </h4>
+    <h4 class="text-center">
+      Validate your article claims against our machine learning system to predict its credibility.
+    </h4>
+    <hr>
+  </div>
+  <br>
+  <div class="container text-center">
+    <div>
+      <textarea name="article" id="article" cols="100" rows="10" placeholder="Write/ Paste your article to test here" class="form-control"></textarea>
+      <br>
+      <button class="button-one btn-block" id="check">Check</button>
+    </div>
+    <br>
+    <div id="result"></div>
+  </div>
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script>
+    $("#check").click(function(){
+      let article = $("#article").val();
+      if(article.length) {
+        $.ajax({
+          url: 'http://127.0.0.1:5000/news',
+          type: 'POST',
+          dataType: 'json',
+          data: {article: article},
+        })
+        .done(function(res) {
+          let prob = (res.probability*100).toFixed(2);
+          if(prob<50) {
+            $("#result").html(`<h2 class='text-danger'>The probability of Truth is ${prob}</h2>`);
+          } else if(prob<65) {
+            $("#result").html(`<h2 class='text-warning'>The probability of Truth is ${prob}</h2>`);
+          } else {
+            $("#result").html(`<h2 class='text-success'>The probability of Truth is ${prob}</h2>`);
+          }
+        })
+        .fail(function() {
+          console.log("error");
+        })
+        .always(function() {
+          console.log("complete");
+        });
+        
+
+      } else {
+        $("#result").html("<h2 class='text-danger'>There is nothing to check here!</h2>")
+      }
+    });
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
